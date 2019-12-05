@@ -40,16 +40,35 @@ class trainset(Dataset):
     def __len__(self):
         return len(self.images)
 
+class testset(Dataset):
+    def __init__(self, loader=default_loader):
+        #定义好 image 的路径
+        file_train = np.load('./data/files_test.npy')
+        target_train = np.load('./data/target_test.npy')
+        self.images = file_train
+        self.target = target_train
+        self.loader = loader
 
-train_data  = trainset()
-trainloader = DataLoader(train_data, batch_size=4,shuffle=True)
-dataiter = iter(trainloader)
-images, labels = dataiter.next()
-print(type(images), type(labels))
-count = 0
-for npimg in images:
-    plt.imshow(np.transpose(npimg, (1, 2, 0)))
-    plt.show()
-    print(labels[count])
-    count += 1
+    def __getitem__(self, index):
+        fn = self.images[index]
+        img = self.loader(fn)
+        target = self.target[index]
+        return img,target
+
+    def __len__(self):
+        return len(self.images)
+
+
+# train_data  = trainset()
+# trainloader = DataLoader(train_data, batch_size=1,shuffle=True)
+# dataiter = iter(trainloader)
+# images, labels = dataiter.next()
+# print(type(images), type(labels), images.shape)
+# count = 0
+# for npimg in images:
+#     print(type(npimg), npimg.shape)
+#     plt.imshow(np.transpose(npimg, (1, 2, 0)))
+#     plt.show()
+#     print(labels[count])
+#     count += 1
 # print(images, labels)
