@@ -65,10 +65,16 @@ class testset(Dataset):
 # images, labels = dataiter.next()
 # print(type(images), type(labels), images.shape)
 # count = 0
-# for npimg in images:
-#     print(type(npimg), npimg.shape)
-#     plt.imshow(np.transpose(npimg, (1, 2, 0)))
-#     plt.show()
-#     print(labels[count])
+# print(len(images))
+# for npimg, label in dataiter:
+#     # print(type(npimg), npimg.shape)
+#     print(label)
+#     for img in npimg:
+#         plt.imshow(np.transpose(img, (1, 2, 0)))
+#     # plt.show()
+#     # 关闭当前显示的图像
+#         plt.pause(1)
+#         plt.close()
+    
 #     count += 1
 # print(images, labels)

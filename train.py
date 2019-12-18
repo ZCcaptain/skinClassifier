@@ -5,7 +5,7 @@ import torch.optim as optim
 from  model import Activation_Net,simpleNet,Net
 from dataloader import trainset,testset
 from torch.utils.data import Dataset, DataLoader
-
+from matplotlib import pyplot as plt
 
 import insightface
 import cv2
@@ -26,16 +26,16 @@ testloader = DataLoader(test_data, batch_size=1,shuffle=True)
 
 
 # model = model.simpleNet(512, 300, 100, 10)
-# model = Activation_Net(500 * 500 * 3, 500, 100, 4)
+model = Activation_Net(500 * 500 * 3, 500, 100, 4)
 # model = net.Batch_Net(28 * 28, 300, 100, 10)
-model = Net()
+# model = Net()
 if torch.cuda.is_available():
     model = model.cuda()
  
 # 定义损失函数和优化器
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+optimizer = optim.SGD(model.parameters(), lr=0.001)
 
 # classes = ['White', 'Black', 'Asian', 'Indian']
 # model.train()
@@ -46,24 +46,18 @@ for epoch in range(10):  # loop over the dataset multiple times
       for i, data in enumerate(trainloader):
         # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data
-            # for ip in inputs:
-            #       cv2.imshow('1', ip.numpy())
-            #       cv2.waitKey(0)
-            # for label in labels:
-            #       print(label)
             if torch.cuda.is_available():
                   inputs = inputs.cuda()
                   labels = labels.cuda()
-            # else:
-                  # inputs.requires_gard = True
-                  # labels = inputs.float()
             # zero the parameter gradients
             
       # forward + backward + optimize
-            outputs = model(inputs)
+            if inputs.shape != (1, 3, 500, 500):
+                  print(inputs.size())
+                  continue
+            outputs = model(inputs.view(-1, 3*500*500))
             # outputs = outputs.unsqueeze(0)
             # labels = labels.squeeze(0)
-  
             optimizer.zero_grad()
             loss = criterion(outputs, labels)
             print(loss)
