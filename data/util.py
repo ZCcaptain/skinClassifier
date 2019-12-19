@@ -2,30 +2,21 @@ import os
 import cv2
 from pandas import Series,DataFrame 
 import insightface
-import cv2
 import numpy as np 
 
 valid_suffix = ['.jpg', '.jpeg', '.png']
 invalid_suffix = ['.gif']
 def rename(path):
     i = 0
-    # '该文件夹下所有的文件（包括文件夹）'
     FileList = os.listdir(path)
-    # '遍历所有文件'
     for files in FileList:
-        # '原来的文件路径'
         oldDirPath = os.path.join(path, files)
-        # '如果是文件夹则递归调用'
         if os.path.isdir(oldDirPath):
             rename(oldDirPath)
-        # '文件名'
         fileName = os.path.splitext(files)[0]
-        # '文件扩展名'
         fileType = os.path.splitext(files)[1]
         print(fileName, ' ', fileType)
-        # '新的文件路径'
         # newDirPath = os.path.join(path, str(i) + fileType)
-        # '重命名'
         # os.rename(oldDirPath, newDirPath)
         i += 1
 
@@ -151,6 +142,30 @@ def generateTargetList():
             np.save( "./data/target_test.npy" ,train_list )
         train_list = []
 
+def generateFileNP():
+    train_path = './data/train'
+    test_path = './data/test'
+    modelface = insightface.app.FaceAnalysis()
+    ctx_id = -1
+    modelface.prepare(ctx_id = ctx_id, nms=0.4)
+    train_list = []
+    for path in (train_path, test_path):
+        FileList = os.listdir(path)
+        for files in FileList:
+            file_name = os.path.join(path, files)
+            fileName = os.path.splitext(files)[0]
+            img = cv2.imread(file_name)
+            faces = modelface.get(img)
+            if len(faces) == 0:
+                  continue
+            data = faces[0].embedding
+            if path is train_path:
+                np.save('./data/train2/' + fileName+'.npy', data)
+            else:
+                np.save('./data/test2/' + fileName+'.npy', data)
+    
+
+
 # generateVectorDataset('./data/test')
 
 # x = np.load('./data/target_train.npy')
@@ -161,5 +176,6 @@ def generateTargetList():
 # print(y)
 # print(len(y))
 # print(type(y))
-generateFileList()
-generateTargetList()
+# generateFileList()
+# generateTargetList()
+generateFileNP()

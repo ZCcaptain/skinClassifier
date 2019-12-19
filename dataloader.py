@@ -3,7 +3,7 @@ from torchvision import transforms, utils
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
-
+import cv2
 # normalize = transforms.Normalize(
 #     mean=[0.485, 0.456, 0.406],
 #     std=[0.229, 0.224, 0.225]
@@ -11,15 +11,16 @@ import matplotlib.pyplot as plt
 preprocess = transforms.Compose([
     #transforms.Scale(256),
     #transforms.CenterCrop(224),
-    transforms.ToTensor(),
+    # transforms.ToTensor(),
     # normalize
 ])
 
 def default_loader(path):
-    img_pil =  Image.open(path)
-    img_pil = img_pil.resize((500,500))
-    img_tensor = preprocess(img_pil)
-    return img_tensor
+    # img_pil =  Image.open(path)
+    # img_pil = img_pil.resize((500,500))
+    # img_tensor = preprocess(img_pil)
+    img = cv2.imread(path)
+    return img
 
 #当然出来的时候已经全都变成了tensor
 class trainset(Dataset):
@@ -59,8 +60,10 @@ class testset(Dataset):
         return len(self.images)
 
 
-# train_data  = trainset()
-# trainloader = DataLoader(train_data, batch_size=1,shuffle=True)
+train_data  = trainset()
+test_data = testset()
+trainloader = DataLoader(train_data, batch_size=1,shuffle=True)
+testloader = DataLoader(test_data, batch_size=1,shuffle=True)
 # dataiter = iter(trainloader)
 # images, labels = dataiter.next()
 # print(type(images), type(labels), images.shape)
@@ -69,12 +72,13 @@ class testset(Dataset):
 # for npimg, label in dataiter:
 #     # print(type(npimg), npimg.shape)
 #     print(label)
-#     for img in npimg:
-#         plt.imshow(np.transpose(img, (1, 2, 0)))
+#     print(npimg.shape)
+#     # for img in npimg:
+#     #     plt.imshow(np.transpose(img, (1, 2, 0)))
 #     # plt.show()
 #     # 关闭当前显示的图像
-#         plt.pause(1)
-#         plt.close()
+#         # plt.pause(1)
+#         # plt.close()
     
 #     count += 1
 # print(images, labels)

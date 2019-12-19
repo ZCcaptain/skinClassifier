@@ -11,9 +11,9 @@ def url_to_image(url):
     return image
 
 
-img = cv2.imread('/home/zhaochao/workspace/skinClassifier/data/yellow/1.jpg')
-cv2.imshow('s', img)
-cv2.waitKey(0)
+img = cv2.imread('./data/train/0_0.jpg')
+# cv2.imshow('s', img)
+# cv2.waitKey(0)
 model = insightface.app.FaceAnalysis()
 ctx_id = -1
 model.prepare(ctx_id = ctx_id, nms=0.4)

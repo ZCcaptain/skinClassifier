@@ -26,7 +26,7 @@ testloader = DataLoader(test_data, batch_size=1,shuffle=True)
 
 
 # model = model.simpleNet(512, 300, 100, 10)
-model = Activation_Net(500 * 500 * 3, 500, 100, 4)
+model = Activation_Net(512, 256, 128, 4)
 # model = net.Batch_Net(28 * 28, 300, 100, 10)
 # model = Net()
 if torch.cuda.is_available():
@@ -39,23 +39,36 @@ optimizer = optim.SGD(model.parameters(), lr=0.001)
 
 # classes = ['White', 'Black', 'Asian', 'Indian']
 # model.train()
+modelface = insightface.app.FaceAnalysis()
+ctx_id = -1
+modelface.prepare(ctx_id = ctx_id, nms=0.4)
 
 for epoch in range(10):  # loop over the dataset multiple times
 
       running_loss = 0.0
+      count = 0
       for i, data in enumerate(trainloader):
         # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data
+            
+            # zero the parameter gradients
+            
+            img = torch.squeeze(inputs).numpy()
+            faces = modelface.get(img)
+            if len(faces) == 0:
+                  continue
+            
+            inputs = torch.from_numpy((faces[0].embedding)).unsqueeze(0)
+            print(inputs.shape)
             if torch.cuda.is_available():
                   inputs = inputs.cuda()
                   labels = labels.cuda()
-            # zero the parameter gradients
-            
       # forward + backward + optimize
-            if inputs.shape != (1, 3, 500, 500):
+            if inputs.shape != (1, 512):
                   print(inputs.size())
                   continue
-            outputs = model(inputs.view(-1, 3*500*500))
+            # print(inputs.size())
+            outputs = model(inputs)
             # outputs = outputs.unsqueeze(0)
             # labels = labels.squeeze(0)
             optimizer.zero_grad()
@@ -63,11 +76,11 @@ for epoch in range(10):  # loop over the dataset multiple times
             print(loss)
             loss.backward()
             optimizer.step()
-
+            count += 1
                   # print statistics
             running_loss += loss.item()
-            if i % 2000 == 0:    # print every 2000 mini-batches
-                  print('[%d, %5d] loss: %.9f' %(epoch + 1, i + 1, running_loss / 2000))
+            if count % 1999 == 0:    # print every 2000 mini-batches
+                  print('[%d, %5d] loss: %.9f' %(epoch + 1, count + 1, running_loss / 2000))
                   running_loss = 0.0
 
 print('Finished Training')
